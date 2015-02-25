@@ -1,31 +1,32 @@
-/**
- * This file is part of Everit - Jetty OSGi Boot.
+/*
+ * Copyright (C) 2015 Everit Kft. (http://www.everit.org)
  *
- * Everit - Jetty OSGi Boot is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Everit - Jetty OSGi Boot is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Everit - Jetty OSGi Boot.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.everit.osgi.jetty.boot.internal;
 
-import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import org.apache.felix.http.proxy.ProxyListener;
 import org.apache.felix.http.proxy.ProxyServlet;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -35,107 +36,205 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 
+/**
+ * Activator of Jetty Boot Bundle that registers a Jetty Server based on configuration.
+ *
+ */
 public class JettyBootActivator implements BundleActivator {
 
-    private Server server;
-    private ServiceRegistration<Server> serverServiceRegistration;
+  private static final String CONNECTOR_NAME_HTTP = "http";
 
-    private ServerConnector createServerConnector(final int port) {
+  private static final String CONNECTOR_NAME_HTTPS = "https";
 
-        String host = System.getProperty(JettyBootConstants.SYSPROP_HTTP_HOST);
+  private Server server;
 
-        Integer idleTimeout = resolveProperty(JettyBootConstants.SYSPROP_IDLE_TIMEOUT,
-                JettyBootConstants.DEFAULT_IDLE_TIMEOUT);
+  private ServiceRegistration<Server> serverServiceRegistration;
 
-        ServerConnector serverConnector = new ServerConnector(server);
-        if (host != null) {
-            serverConnector.setHost(host);
-        }
-        serverConnector.setPort(port);
-        serverConnector.setReuseAddress(true);
-        serverConnector.setIdleTimeout(idleTimeout);
+  private ServerConnector createServerConnector(final String host, final int port,
+      final int idleTimeout) {
 
-        server.addConnector(serverConnector);
+    ServerConnector serverConnector = new ServerConnector(server);
+    if (host != null) {
+      serverConnector.setHost(host);
+    }
+    serverConnector.setPort(port);
+    serverConnector.setReuseAddress(true);
+    serverConnector.setIdleTimeout(idleTimeout);
 
-        return serverConnector;
+    server.addConnector(serverConnector);
+
+    return serverConnector;
+  }
+
+  private int resolveIntProperty(final String systemPropertyName, final int defaultValue) {
+    return resolveIntProperty(systemPropertyName, null, defaultValue);
+  }
+
+  private int resolveIntProperty(final String systemPropertyName, final String fallbackProperty,
+      final int defaultValue) {
+
+    String property = System.getProperty(systemPropertyName);
+
+    if (property == null && fallbackProperty != null) {
+      property = System.getProperty(fallbackProperty);
+    }
+    if (property == null) {
+      return defaultValue;
+    }
+    try {
+      return Integer.parseInt(property);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Could not parse value of '" + systemPropertyName
+          + "' property value: "
+          + property, e);
+    }
+  }
+
+  private String resolveKeyStore(final BundleContext context) {
+    String result = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE);
+    if (result == null) {
+      result = context.getBundle().getResource("META-INF/keystore.jks").toExternalForm();
+    }
+    return result;
+  }
+
+  @Override
+  public void start(final BundleContext context) throws Exception {
+    Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
+
+    String host = System.getProperty(JettyBootConstants.SYSPROP_HTTP_HOST);
+
+    int idleTimeout = resolveIntProperty(JettyBootConstants.SYSPROP_IDLE_TIMEOUT,
+        JettyBootConstants.DEFAULT_IDLE_TIMEOUT);
+
+    int httpPort = resolveIntProperty(JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT,
+        JettyBootConstants.SYSPROP_HTTP_PORT, JettyBootConstants.DEFAULT_HTTP_PORT);
+
+    int httpsPort = resolveIntProperty(JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT,
+        JettyBootConstants.SYSPROP_HTTP_PORT_SECURE, JettyBootConstants.DEFAULT_HTTP_PORT_SECURE);
+
+    if (httpPort < 0 && httpsPort < 0) {
+      return;
     }
 
-    private int resolveProperty(final String systemPropertyName, final int defaultValue) {
-        String property = System.getProperty(systemPropertyName);
-        if (property == null) {
-            return defaultValue;
-        }
-        try {
-            return Integer.parseInt(property);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Could not parse value of '" + systemPropertyName + "' property value: "
-                    + property, e);
-        }
+    String contextPath = System.getProperty(JettyBootConstants.SYSPROP_CONTEXT_PATH,
+        JettyBootConstants.DEFAULT_CONTEXT_PATH);
+
+    int sessionTimeout = resolveIntProperty(JettyBootConstants.SYSPROP_SESSION_TIMEOUT,
+        JettyBootConstants.DEFAULT_SESSION_TIMEOUT);
+
+    String keystorePassword = System.getProperty(
+        JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_PASSWORD,
+        JettyBootConstants.DEFAULT_HTTPS_KEYSTORE_PASSWORD);
+
+    String keyPassword = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD);
+    String certAlias = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS);
+
+    server = new Server();
+
+    if (httpPort >= 0) {
+      ServerConnector serverConnector = createServerConnector(host, httpPort, idleTimeout);
+      serverConnector.setName(CONNECTOR_NAME_HTTP);
     }
 
-    @Override
-    public void start(final BundleContext context) throws Exception {
-        int httpPort = resolveProperty(JettyBootConstants.SYSPROP_HTTP_PORT, JettyBootConstants.DEFAULT_HTTP_PORT);
+    if (httpsPort >= 0) {
+      ServerConnector serverConnector = createServerConnector(host, httpsPort, idleTimeout);
+      serverConnector.setName(CONNECTOR_NAME_HTTPS);
 
-        int httpsPort = resolveProperty(JettyBootConstants.SYSPROP_HTTP_PORT_SECURE,
-                JettyBootConstants.DEFAULT_HTTP_PORT_SECURE);
+      SslConnectionFactory sslConnectionFactory = new SslConnectionFactory();
 
-        String contextPath = System.getProperty(JettyBootConstants.SYSPROP_CONTEXT_PATH,
-                JettyBootConstants.DEFAULT_CONTEXT_PATH);
+      SslContextFactory sslContextFactory = sslConnectionFactory.getSslContextFactory();
+      String keystore = resolveKeyStore(context);
+      sslContextFactory.setKeyStorePath(keystore);
 
-        server = new Server();
+      sslContextFactory.setKeyStorePassword(keystorePassword);
 
-        if (httpPort >= 0) {
-            createServerConnector(httpPort);
-        }
+      if (keyPassword != null) {
+        sslContextFactory.setKeyManagerPassword(keyPassword);
+      }
 
-        if (httpsPort >= 0) {
-            ServerConnector serverConnector = createServerConnector(httpsPort);
+      sslContextFactory.setCertAlias(certAlias);
 
-            SslConnectionFactory sslConnectionFactory = new SslConnectionFactory();
+      serverConnector.addConnectionFactory(sslConnectionFactory);
+      serverConnector.setDefaultProtocol(sslConnectionFactory.getProtocol());
 
-            SslContextFactory sslContextFactory = sslConnectionFactory.getSslContextFactory();
-            URL keystore = context.getBundle().getResource("META-INF/keystore.jks");
-            sslContextFactory.setKeyStorePath(keystore.toExternalForm());
-            sslContextFactory.setKeyStorePassword("changeit");
+      serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE, keystore);
+      serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS, certAlias);
+    }
 
-            serverConnector.addConnectionFactory(sslConnectionFactory);
-            serverConnector.setDefaultProtocol(sslConnectionFactory.getProtocol());
-        }
+    ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
+    server.setHandler(handlerCollection);
 
-        ContextHandlerCollection handlerCollection = new ContextHandlerCollection();
-        server.setHandler(handlerCollection);
+    ServletContextHandler servletContextHandler = new ServletContextHandler(handlerCollection,
+        contextPath);
 
-        ServletContextHandler servletContextHandler = new ServletContextHandler(handlerCollection, contextPath);
+    servletContextHandler.addEventListener(new ProxyListener());
+    servletContextHandler.addServlet(new ServletHolder(new ProxyServlet()), "/*");
+    servletContextHandler.setAttribute(BundleContext.class.getName(), context);
 
-        servletContextHandler.addEventListener(new ProxyListener());
-        servletContextHandler.addServlet(new ServletHolder(new ProxyServlet()), "/*");
-        servletContextHandler.setAttribute(BundleContext.class.getName(), context);
-        try {
-            server.start();
+    SessionHandler sessionHandler = new SessionHandler();
+    sessionHandler.getSessionManager().setMaxInactiveInterval(sessionTimeout);
 
-            Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
+    servletContextHandler.setSessionHandler(sessionHandler);
+    try {
+      server.start();
 
-            serviceProps.put(JettyBootConstants.SERVICE_PROPERTY_JETTY_SERVER_NAME,
-                    JettyBootConstants.SERVICE_PROPERTY_VALUE_JETTY_SERVER_NAME);
-
-            serviceProps.put(Constants.SERVICE_DESCRIPTION, JettyBootConstants.SERVICE_DESCRIPTION_JETTY_SERVER);
-            serverServiceRegistration = context.registerService(Server.class, server, serviceProps);
-        } catch (Exception e) {
-            try {
-                server.stop();
-            } catch (Exception stopE) {
-                e.addSuppressed(stopE);
+      Connector[] connectors = server.getConnectors();
+      for (Connector connector : connectors) {
+        if (connector instanceof NetworkConnector) {
+          String connectorName = connector.getName();
+          if (CONNECTOR_NAME_HTTP.equals(connectorName)
+              || CONNECTOR_NAME_HTTPS.equals(connectorName)) {
+            @SuppressWarnings("resource")
+            NetworkConnector networkConnector = ((NetworkConnector) connector);
+            if (CONNECTOR_NAME_HTTP.equals(connectorName)) {
+              httpPort = networkConnector.getLocalPort();
+            } else {
+              httpsPort = networkConnector.getLocalPort();
             }
-            throw e;
+          }
         }
-    }
+      }
 
-    @Override
-    public void stop(final BundleContext context) throws Exception {
-        serverServiceRegistration.unregister();
+      serviceProps.put(JettyBootConstants.SERVICE_PROPERTY_JETTY_SERVER_NAME,
+          JettyBootConstants.SERVICE_PROPERTY_VALUE_JETTY_SERVER_NAME);
+
+      serviceProps.put(Constants.SERVICE_DESCRIPTION,
+          JettyBootConstants.SERVICE_DESCRIPTION_JETTY_SERVER);
+
+      if (host != null) {
+        serviceProps.put(JettyBootConstants.SYSPROP_HTTP_HOST, host);
+      } else {
+        serviceProps.put(JettyBootConstants.SYSPROP_HTTP_HOST, "*");
+      }
+
+      serviceProps.put(JettyBootConstants.SYSPROP_IDLE_TIMEOUT, idleTimeout);
+      serviceProps.put(JettyBootConstants.SYSPROP_CONTEXT_PATH, contextPath);
+      serviceProps.put(JettyBootConstants.SYSPROP_SESSION_TIMEOUT, sessionTimeout);
+      serviceProps.put(JettyBootConstants.SYSPROP_HTTP_PORT, httpPort);
+      if (httpsPort > 0) {
+        serviceProps.put(JettyBootConstants.SYSPROP_HTTP_PORT_SECURE, httpsPort);
+      }
+
+      serverServiceRegistration = context.registerService(Server.class, server, serviceProps);
+    } catch (Exception e) {
+      try {
         server.stop();
         server.destroy();
+      } catch (Exception stopE) {
+        e.addSuppressed(stopE);
+      }
+      throw e;
     }
+  }
+
+  @Override
+  public void stop(final BundleContext context) throws Exception {
+    if (serverServiceRegistration != null) {
+      serverServiceRegistration.unregister();
+      server.stop();
+      server.destroy();
+    }
+  }
 
 }

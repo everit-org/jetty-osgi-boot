@@ -1,47 +1,151 @@
-/**
- * This file is part of Everit - Jetty OSGi Boot.
+/*
+ * Copyright (C) 2015 Everit Kft. (http://www.everit.org)
  *
- * Everit - Jetty OSGi Boot is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Everit - Jetty OSGi Boot is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Everit - Jetty OSGi Boot.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.everit.osgi.jetty.boot;
 
+/**
+ * Constant values of Everit - Jetty Boot.
+ */
 public final class JettyBootConstants {
 
-    public static final String DEFAULT_CONTEXT_PATH = "/";
+  /**
+   * Default value of {@link #SYSPROP_CONTEXT_PATH}.
+   */
+  public static final String DEFAULT_CONTEXT_PATH = "/";
 
-    public static final int DEFAULT_HTTP_PORT = 80;
+  /**
+   * Default value of {@value #SYSPROP_HTTP_PORT}.
+   */
+  public static final int DEFAULT_HTTP_PORT = 0;
 
-    public static final int DEFAULT_HTTP_PORT_SECURE = 443;
+  /**
+   * Default value of {@value #SYSPROP_HTTP_PORT_SECURE}.
+   */
+  public static final int DEFAULT_HTTP_PORT_SECURE = 443;
 
-    public static final int DEFAULT_IDLE_TIMEOUT = 60000;
+  /**
+   * Default value of {@link #SYSPROP_HTTPS_KEYSTORE_PASSWORD}.
+   */
+  public static final String DEFAULT_HTTPS_KEYSTORE_PASSWORD = "changeit";
 
-    public static final String SERVICE_DESCRIPTION_JETTY_SERVER = "Everit Jetty Boot Server";
+  /**
+   * Default value of {@value #SYSPROP_IDLE_TIMEOUT}.
+   */
+  public static final int DEFAULT_IDLE_TIMEOUT = 60000;
 
-    public static final String SERVICE_PROPERTY_JETTY_SERVER_NAME = "jetty.server.name";
+  /**
+   * Default value of {@value #SYSPROP_SESSION_TIMEOUT}.
+   */
+  public static final int DEFAULT_SESSION_TIMEOUT = 30 * 60;
 
-    public static final String SERVICE_PROPERTY_VALUE_JETTY_SERVER_NAME = "everit.boot";
+  /**
+   * Jetty {@link org.eclipse.jetty.server.Server} is registered as an OSGi service with
+   * {@link org.osgi.framework.Constants#SERVICE_DESCRIPTION} OSGi service property.
+   */
+  public static final String SERVICE_DESCRIPTION_JETTY_SERVER = "Everit Jetty Boot Server";
 
-    public static final String SYSPROP_CONTEXT_PATH = "org.everit.osgi.jetty.boot.context_path";
+  /**
+   * Jetty {@link org.eclipse.jetty.server.Server} is registered as an OSGi service with this
+   * service property with this name and {@value #SERVICE_PROPERTY_VALUE_JETTY_SERVER_NAME} value.
+   */
+  public static final String SERVICE_PROPERTY_JETTY_SERVER_NAME = "jetty.server.name";
 
-    public static final String SYSPROP_HTTP_HOST = "org.everit.osgi.jetty.boot.host";
+  /**
+   * Jetty {@link org.eclipse.jetty.server.Server} is registered as an OSGi service with this
+   * service property with {@link #SERVICE_PROPERTY_JETTY_SERVER_NAME} name and this value.
+   */
+  public static final String SERVICE_PROPERTY_VALUE_JETTY_SERVER_NAME = "everit.boot";
 
-    public static final String SYSPROP_HTTP_PORT = "org.osgi.service.http.port";
+  /**
+   * The servlet Context Path to use for the Http Service. If this property is not configured it
+   * defaults to {@value #DEFAULT_CONTEXT_PATH}. This must be a valid path starting with a slash and
+   * not ending with a slash (unless it is the root context).
+   */
+  public static final String SYSPROP_CONTEXT_PATH = "org.everit.osgi.jetty.boot.context_path";
 
-    public static final String SYSPROP_HTTP_PORT_SECURE = "org.osgi.service.http.port.secure";
+  /**
+   * Host name or IP Address of the interface to listen on. The default is null causing Jetty to
+   * listen on all interfaces.
+   */
+  public static final String SYSPROP_HTTP_HOST = "org.everit.osgi.jetty.boot.host";
 
-    public static final String SYSPROP_IDLE_TIMEOUT = "org.everit.osgi.jetty.boot.idle_timeout";
+  /**
+   * The port used for servlets and resources available via HTTP. A negative port number disables
+   * HTTP port.
+   */
+  public static final String SYSPROP_HTTP_PORT = "org.osgi.service.http.port";
 
-    private JettyBootConstants() {
-    }
+  /**
+   * The port used for servlets and resources available via HTTPS. A negative port number disables
+   * HTTPS port.
+   */
+  public static final String SYSPROP_HTTP_PORT_SECURE = "org.osgi.service.http.port.secure";
+
+  /**
+   * The file or URL of the SSL Key store. Default value is the keystore that is embedded into the
+   * boot bundle.
+   */
+  public static final String SYSPROP_HTTPS_KEYSTORE = "org.everit.osgi.jetty.boot.https.keystore";
+
+  /**
+   * Alias of SSL certificate for the connector.
+   */
+  public static final String SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS =
+      "org.everit.osgi.jetty.boot.https.keystore.key.alias";
+
+  /**
+   * The password for the key in the keystore.
+   */
+  public static final String SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD =
+      "org.everit.osgi.jetty.boot.https.keystore.key.password";
+
+  /**
+   * Password of the HTTPS keystore. Default value is {@value #DEFAULT_HTTPS_KEYSTORE_PASSWORD}.
+   */
+  public static final String SYSPROP_HTTPS_KEYSTORE_PASSWORD =
+      "org.everit.osgi.jetty.boot.https.keystore.password";
+
+  /**
+   * Sets the maximum Idle time for a connection, which roughly translates to the
+   * {@link java.net.Socket#setSoTimeout(int)} call, although with NIO implementations other
+   * mechanisms may be used to implement the timeout.
+   *
+   * <p>
+   * For more information, see
+   * {@link org.eclipse.jetty.server.AbstractConnector#setIdleTimeout(long)}.
+   */
+  public static final String SYSPROP_IDLE_TIMEOUT = "org.everit.osgi.jetty.boot.idle_timeout";
+
+  /**
+   * In case this system property is specified, it overrides the value of
+   * {@value #SYSPROP_HTTP_PORT} system property.
+   */
+  public static final String SYSPROP_JETTY_BOOT_HTTP_PORT = "org.everit.osgi.jetty.boot.http.port";
+
+  /**
+   * In case this system property is specified, it overrides the value of
+   * {@value #SYSPROP_HTTP_PORT_SECURE} system property.
+   */
+  public static final String SYSPROP_JETTY_BOOT_HTTP_PORT_SECURE =
+      "org.everit.osgi.jetty.boot.http.port.secure";
+
+  /**
+   * Allows for the specification of the Session life time as a number of seconds.
+   */
+  public static final String SYSPROP_SESSION_TIMEOUT = "org.everit.osgi.jetty.boot.session.timeout";
+
+  private JettyBootConstants() {
+  }
 }
