@@ -7,9 +7,9 @@ After installing this bundle with its dependencies, a Jetty will
 be started on port 80 (HTTP) and 443 (HTTPS) by default. The default
 settings can be overridden by the following system properties:
 
- - _org.osgi.service.http.port_: The port used for servlets and resources
+ - __org.osgi.service.http.port__: The port used for servlets and resources
    available via HTTP. A negative port number disables HTTP port.
- - _org.osgi.service.http.port.secure_: The port used for servlets and
+ - __org.osgi.service.http.port.secure__: The port used for servlets and
    resources available via HTTPS. A negative port number disables HTTPS port.
  - __:
  - __:

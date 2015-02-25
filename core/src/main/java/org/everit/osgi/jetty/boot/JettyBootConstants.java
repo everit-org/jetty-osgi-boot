@@ -41,6 +41,12 @@ public final class JettyBootConstants {
   public static final String DEFAULT_HTTPS_KEYSTORE_PASSWORD = "changeit";
 
   /**
+   * Default value of {@link #SYSPROP_HTTPS_KEYSTORE_TYPE} and
+   * {@value #SYSPROP_HTTPS_TRUSTSTORE_TYPE}.
+   */
+  public static final String DEFAULT_HTTPS_KEYSTORE_TYPE = "JKS";
+
+  /**
    * Default value of {@value #SYSPROP_IDLE_TIMEOUT}.
    */
   public static final int DEFAULT_IDLE_TIMEOUT = 60000;
@@ -116,6 +122,24 @@ public final class JettyBootConstants {
    */
   public static final String SYSPROP_HTTPS_KEYSTORE_PASSWORD =
       "org.everit.osgi.jetty.boot.https.keystore.password";
+
+  /**
+   * Type of keystore for HTTPS connections. Default value is {@value #DEFAULT_HTTPS_KEYSTORE_TYPE}.
+   */
+  public static final String SYSPROP_HTTPS_KEYSTORE_TYPE =
+      "org.everit.osgi.jetty.boot.https.keystore.type";
+
+  /**
+   * Path or URL of the file containing the truststore.
+   */
+  public static final String SYSPROP_HTTPS_TRUSTSTORE =
+      "org.everit.osgi.jetty.boot.https.truststore";
+
+  /**
+   * Type of truststore. Default value is {@link #DEFAULT_HTTPS_KEYSTORE_TYPE}.
+   */
+  public static final String SYSPROP_HTTPS_TRUSTSTORE_TYPE =
+      "org.everit.osgi.jetty.boot.https.truststore.type";
 
   /**
    * Sets the maximum Idle time for a connection, which roughly translates to the
