@@ -56,6 +56,12 @@ public final class JettyBootConstants {
    */
   public static final int DEFAULT_SESSION_TIMEOUT = 30 * 60;
 
+  public static final String OPTION_CLIENTCERT_NEEDS = "needs";
+
+  public static final String OPTION_CLIENTCERT_NONE = "none";
+
+  public static final String OPTION_CLIENTCERT_WANTS = "wants";
+
   /**
    * Jetty {@link org.eclipse.jetty.server.Server} is registered as an OSGi service with
    * {@link org.osgi.framework.Constants#SERVICE_DESCRIPTION} OSGi service property.
@@ -100,6 +106,13 @@ public final class JettyBootConstants {
   public static final String SYSPROP_HTTP_PORT_SECURE = "org.osgi.service.http.port.secure";
 
   /**
+   * Flag to determine if the HTTPS protocol requires, wants or does not use client certificates.
+   * Legal values are needs, wants and none. The default is none.
+   */
+  public static final String SYSPROP_HTTPS_CLIENTCERT =
+      "org.everit.osgi.jetty.boot.https.clientcertificate";
+
+  /**
    * The file or URL of the SSL Key store. Default value is the keystore that is embedded into the
    * boot bundle.
    */
@@ -134,6 +147,12 @@ public final class JettyBootConstants {
    */
   public static final String SYSPROP_HTTPS_TRUSTSTORE =
       "org.everit.osgi.jetty.boot.https.truststore";
+
+  /**
+   * The password for the trust store.
+   */
+  public static final String SYSPROP_HTTPS_TRUSTSTORE_PASSWORD =
+      "org.everit.osgi.jetty.boot.https.truststore.password";
 
   /**
    * Type of truststore. Default value is {@link #DEFAULT_HTTPS_KEYSTORE_TYPE}.

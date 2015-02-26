@@ -7,6 +7,8 @@ public class JettyConfiguration {
 
   public String certAlias;
 
+  public String clientCert;
+
   public String contextPath;
 
   public String host;
@@ -28,6 +30,8 @@ public class JettyConfiguration {
   public int sessionTimeout;
 
   public String trustStore;
+
+  public String trustStorePassword;
 
   public String trustStoreType;
 

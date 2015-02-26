@@ -50,6 +50,14 @@ public class JettyBootActivator implements BundleActivator {
 
   private ServiceRegistration<Server> serverServiceRegistration;
 
+  private void addPasswordToServiceProps(final Dictionary<String, Object> serviceProps,
+      final String syspropName, final String password) {
+
+    if (password != null) {
+      serviceProps.put(syspropName, "*******");
+    }
+  }
+
   private void createHttpConnector(final JettyConfiguration configuration) {
     ServerConnector serverConnector = createServerConnector(configuration.host,
         configuration.httpPort,
@@ -84,7 +92,10 @@ public class JettyBootActivator implements BundleActivator {
     if (configuration.trustStore != null) {
       sslContextFactory.setTrustStorePath(configuration.trustStore);
       sslContextFactory.setTrustStoreType(configuration.trustStoreType);
+      sslContextFactory.setTrustStorePassword(configuration.trustStorePassword);
     }
+
+    setClientCertOnSSLContextFactory(configuration, sslContextFactory);
 
     serverConnector.addConnectionFactory(sslConnectionFactory);
     serverConnector.setDefaultProtocol(sslConnectionFactory.getProtocol());
@@ -111,8 +122,14 @@ public class JettyBootActivator implements BundleActivator {
 
     serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE, configuration.keystore);
 
+    addPasswordToServiceProps(serviceProps, JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_PASSWORD,
+        configuration.keystorePassword);
+
     putIfNotNull(serviceProps, JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS,
         configuration.certAlias);
+
+    addPasswordToServiceProps(serviceProps, JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD,
+        configuration.keyPassword);
 
     serviceProps.put(JettyBootConstants.SERVICE_PROPERTY_JETTY_SERVER_NAME,
         JettyBootConstants.SERVICE_PROPERTY_VALUE_JETTY_SERVER_NAME);
@@ -140,8 +157,12 @@ public class JettyBootActivator implements BundleActivator {
       serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_TYPE,
           configuration.trustStoreType);
 
-      // TODO truststore password and so on
+      addPasswordToServiceProps(serviceProps, JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_PASSWORD,
+          configuration.trustStorePassword);
     }
+
+    putIfNotNull(serviceProps, JettyBootConstants.SYSPROP_HTTPS_CLIENTCERT,
+        configuration.clientCert);
 
     return serviceProps;
   }
@@ -215,7 +236,12 @@ public class JettyBootActivator implements BundleActivator {
       configuration.trustStoreType = System.getProperty(
           JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_TYPE,
           JettyBootConstants.DEFAULT_HTTPS_KEYSTORE_TYPE);
+
+      configuration.trustStorePassword = System
+          .getProperty(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_PASSWORD);
     }
+
+    configuration.clientCert = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_CLIENTCERT);
 
     return configuration;
   }
@@ -250,6 +276,22 @@ public class JettyBootActivator implements BundleActivator {
       result = context.getBundle().getResource("META-INF/keystore.jks").toExternalForm();
     }
     return result;
+  }
+
+  private void setClientCertOnSSLContextFactory(final JettyConfiguration configuration,
+      final SslContextFactory sslContextFactory) {
+    if (configuration.clientCert != null) {
+      if (JettyBootConstants.OPTION_CLIENTCERT_NEEDS.equalsIgnoreCase(configuration.clientCert)) {
+        sslContextFactory.setNeedClientAuth(true);
+      } else if (JettyBootConstants.OPTION_CLIENTCERT_WANTS
+          .equalsIgnoreCase(configuration.clientCert)) {
+        sslContextFactory.setWantClientAuth(true);
+      } else if (!JettyBootConstants.OPTION_CLIENTCERT_NONE
+          .equalsIgnoreCase(configuration.clientCert)) {
+        throw new IllegalArgumentException("Invalid value for property '"
+            + JettyBootConstants.SYSPROP_HTTPS_CLIENTCERT + "': " + configuration.clientCert);
+      }
+    }
   }
 
   @Override
