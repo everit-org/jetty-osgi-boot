@@ -155,7 +155,7 @@ public final class JettyBootConstants {
       "org.everit.osgi.jetty.boot.https.truststore.password";
 
   /**
-   * Type of truststore. Default value is {@link #DEFAULT_HTTPS_KEYSTORE_TYPE}.
+   * Type of truststore. Default value is {@value #DEFAULT_HTTPS_KEYSTORE_TYPE}.
    */
   public static final String SYSPROP_HTTPS_TRUSTSTORE_TYPE =
       "org.everit.osgi.jetty.boot.https.truststore.type";

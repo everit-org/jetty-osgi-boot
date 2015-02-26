@@ -197,7 +197,8 @@ public class JettyBootActivator implements BundleActivator {
     configuration.httpPort = resolveIntProperty(JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT,
         JettyBootConstants.SYSPROP_HTTP_PORT, JettyBootConstants.DEFAULT_HTTP_PORT);
 
-    configuration.httpsPort = resolveIntProperty(JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT,
+    configuration.httpsPort = resolveIntProperty(
+        JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT_SECURE,
         JettyBootConstants.SYSPROP_HTTP_PORT_SECURE, JettyBootConstants.DEFAULT_HTTP_PORT_SECURE);
 
     if (configuration.httpPort < 0 && configuration.httpsPort < 0) {
@@ -224,11 +225,11 @@ public class JettyBootActivator implements BundleActivator {
         JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_PASSWORD,
         JettyBootConstants.DEFAULT_HTTPS_KEYSTORE_PASSWORD);
 
-    configuration.keyPassword = System
-        .getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD);
-
     configuration.certAlias = System
         .getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS);
+
+    configuration.keyPassword = System
+        .getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD);
 
     configuration.trustStore = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE);
 
