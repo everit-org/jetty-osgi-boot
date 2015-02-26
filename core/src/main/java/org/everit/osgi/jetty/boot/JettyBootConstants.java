@@ -28,7 +28,7 @@ public final class JettyBootConstants {
   /**
    * Default value of {@value #SYSPROP_HTTP_PORT}.
    */
-  public static final int DEFAULT_HTTP_PORT = 0;
+  public static final int DEFAULT_HTTP_PORT = 80;
 
   /**
    * Default value of {@value #SYSPROP_HTTP_PORT_SECURE}.
