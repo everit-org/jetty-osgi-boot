@@ -68,6 +68,7 @@
               <framework>felix</framework>
               <systemProperties>
                 <org.osgi.service.http.port>0</org.osgi.service.http.port>
+                <org.osgi.service.http.port.secure>0</org.osgi.service.http.port.secure>
               </systemProperties>
               <vmOptions>
                 <vmOption>-Xdebug</vmOption>
@@ -79,6 +80,7 @@
               <framework>equinox</framework>
               <systemProperties>
                 <org.osgi.service.http.port>0</org.osgi.service.http.port>
+                <org.osgi.service.http.port.secure>0</org.osgi.service.http.port.secure>
               </systemProperties>
               <vmOptions>
                 <vmOption>-Xdebug</vmOption>
