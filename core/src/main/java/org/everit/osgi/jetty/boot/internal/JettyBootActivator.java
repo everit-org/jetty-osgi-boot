@@ -274,7 +274,7 @@ public class JettyBootActivator implements BundleActivator {
   private String resolveKeyStore(final BundleContext context) {
     String result = System.getProperty(JettyBootConstants.PROP_HTTPS_KEYSTORE);
     if (result == null) {
-      result = context.getBundle().getResource("META-INF/keystore-development.jks")
+      result = context.getBundle().getResource("META-INF/development-keystore.jks")
           .toExternalForm();
     }
     return result;
