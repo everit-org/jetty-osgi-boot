@@ -44,7 +44,7 @@ public class JettyTest {
   @Test
   @TestDuringDevelopment
   public void testServerAvailability() {
-    Object httpPortProp = reference.getProperty(JettyBootConstants.SYSPROP_HTTP_PORT);
+    Object httpPortProp = reference.getProperty(JettyBootConstants.PROP_HTTP_PORT);
     int httpPort = (Integer) httpPortProp;
 
     try {

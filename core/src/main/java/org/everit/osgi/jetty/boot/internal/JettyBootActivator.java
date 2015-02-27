@@ -120,15 +120,15 @@ public class JettyBootActivator implements BundleActivator {
   private Dictionary<String, Object> createServiceProps(final JettyConfiguration configuration) {
     Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
 
-    serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE, configuration.keystore);
+    serviceProps.put(JettyBootConstants.PROP_HTTPS_KEYSTORE, configuration.keystore);
 
-    addPasswordToServiceProps(serviceProps, JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_PASSWORD,
+    addPasswordToServiceProps(serviceProps, JettyBootConstants.PROP_HTTPS_KEYSTORE_PASSWORD,
         configuration.keystorePassword);
 
-    putIfNotNull(serviceProps, JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS,
+    putIfNotNull(serviceProps, JettyBootConstants.PROP_HTTPS_KEYSTORE_KEY_ALIAS,
         configuration.certAlias);
 
-    addPasswordToServiceProps(serviceProps, JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD,
+    addPasswordToServiceProps(serviceProps, JettyBootConstants.PROP_HTTPS_KEYSTORE_KEY_PASSWORD,
         configuration.keyPassword);
 
     serviceProps.put(JettyBootConstants.SERVICE_PROPERTY_JETTY_SERVER_NAME,
@@ -138,30 +138,30 @@ public class JettyBootActivator implements BundleActivator {
         JettyBootConstants.SERVICE_DESCRIPTION_JETTY_SERVER);
 
     if (configuration.host != null) {
-      serviceProps.put(JettyBootConstants.SYSPROP_HTTP_HOST, configuration.host);
+      serviceProps.put(JettyBootConstants.PROP_HTTP_HOST, configuration.host);
     } else {
-      serviceProps.put(JettyBootConstants.SYSPROP_HTTP_HOST, "*");
+      serviceProps.put(JettyBootConstants.PROP_HTTP_HOST, "*");
     }
 
-    serviceProps.put(JettyBootConstants.SYSPROP_IDLE_TIMEOUT, configuration.idleTimeout);
-    serviceProps.put(JettyBootConstants.SYSPROP_CONTEXT_PATH, configuration.contextPath);
-    serviceProps.put(JettyBootConstants.SYSPROP_SESSION_TIMEOUT, configuration.sessionTimeout);
-    serviceProps.put(JettyBootConstants.SYSPROP_HTTP_PORT, configuration.httpPort);
+    serviceProps.put(JettyBootConstants.PROP_IDLE_TIMEOUT, configuration.idleTimeout);
+    serviceProps.put(JettyBootConstants.PROP_CONTEXT_PATH, configuration.contextPath);
+    serviceProps.put(JettyBootConstants.PROP_SESSION_TIMEOUT, configuration.sessionTimeout);
+    serviceProps.put(JettyBootConstants.PROP_HTTP_PORT, configuration.httpPort);
 
     if (configuration.httpsPort > 0) {
-      serviceProps.put(JettyBootConstants.SYSPROP_HTTP_PORT_SECURE, configuration.httpsPort);
+      serviceProps.put(JettyBootConstants.PROP_HTTP_PORT_SECURE, configuration.httpsPort);
     }
 
     if (configuration.trustStore != null) {
-      serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE, configuration.trustStore);
-      serviceProps.put(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_TYPE,
+      serviceProps.put(JettyBootConstants.PROP_HTTPS_TRUSTSTORE, configuration.trustStore);
+      serviceProps.put(JettyBootConstants.PROP_HTTPS_TRUSTSTORE_TYPE,
           configuration.trustStoreType);
 
-      addPasswordToServiceProps(serviceProps, JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_PASSWORD,
+      addPasswordToServiceProps(serviceProps, JettyBootConstants.PROP_HTTPS_TRUSTSTORE_PASSWORD,
           configuration.trustStorePassword);
     }
 
-    putIfNotNull(serviceProps, JettyBootConstants.SYSPROP_HTTPS_CLIENTCERT,
+    putIfNotNull(serviceProps, JettyBootConstants.PROP_HTTPS_CLIENTCERT,
         configuration.clientCert);
 
     return serviceProps;
@@ -194,55 +194,55 @@ public class JettyBootActivator implements BundleActivator {
   private JettyConfiguration readConfiguration(final BundleContext context) {
     JettyConfiguration configuration = new JettyConfiguration();
 
-    configuration.httpPort = resolveIntProperty(JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT,
-        JettyBootConstants.SYSPROP_HTTP_PORT, JettyBootConstants.DEFAULT_HTTP_PORT);
+    configuration.httpPort = resolveIntProperty(JettyBootConstants.PROP_JETTY_BOOT_HTTP_PORT,
+        JettyBootConstants.PROP_HTTP_PORT, JettyBootConstants.DEFAULT_HTTP_PORT);
 
     configuration.httpsPort = resolveIntProperty(
-        JettyBootConstants.SYSPROP_JETTY_BOOT_HTTP_PORT_SECURE,
-        JettyBootConstants.SYSPROP_HTTP_PORT_SECURE, JettyBootConstants.DEFAULT_HTTP_PORT_SECURE);
+        JettyBootConstants.PROP_JETTY_BOOT_HTTP_PORT_SECURE,
+        JettyBootConstants.PROP_HTTP_PORT_SECURE, JettyBootConstants.DEFAULT_HTTP_PORT_SECURE);
 
     if (configuration.httpPort < 0 && configuration.httpsPort < 0) {
       return configuration;
     }
 
-    configuration.host = System.getProperty(JettyBootConstants.SYSPROP_HTTP_HOST);
+    configuration.host = System.getProperty(JettyBootConstants.PROP_HTTP_HOST);
 
-    configuration.contextPath = System.getProperty(JettyBootConstants.SYSPROP_CONTEXT_PATH,
+    configuration.contextPath = System.getProperty(JettyBootConstants.PROP_CONTEXT_PATH,
         JettyBootConstants.DEFAULT_CONTEXT_PATH);
 
-    configuration.idleTimeout = resolveIntProperty(JettyBootConstants.SYSPROP_IDLE_TIMEOUT,
+    configuration.idleTimeout = resolveIntProperty(JettyBootConstants.PROP_IDLE_TIMEOUT,
         JettyBootConstants.DEFAULT_IDLE_TIMEOUT);
 
-    configuration.sessionTimeout = resolveIntProperty(JettyBootConstants.SYSPROP_SESSION_TIMEOUT,
+    configuration.sessionTimeout = resolveIntProperty(JettyBootConstants.PROP_SESSION_TIMEOUT,
         JettyBootConstants.DEFAULT_SESSION_TIMEOUT);
 
     configuration.keystore = resolveKeyStore(context);
 
-    configuration.keyStoreType = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_TYPE,
+    configuration.keyStoreType = System.getProperty(JettyBootConstants.PROP_HTTPS_KEYSTORE_TYPE,
         JettyBootConstants.DEFAULT_HTTPS_KEYSTORE_TYPE);
 
     configuration.keystorePassword = System.getProperty(
-        JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_PASSWORD,
+        JettyBootConstants.PROP_HTTPS_KEYSTORE_PASSWORD,
         JettyBootConstants.DEFAULT_HTTPS_KEYSTORE_PASSWORD);
 
     configuration.certAlias = System
-        .getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_ALIAS);
+        .getProperty(JettyBootConstants.PROP_HTTPS_KEYSTORE_KEY_ALIAS);
 
     configuration.keyPassword = System
-        .getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE_KEY_PASSWORD);
+        .getProperty(JettyBootConstants.PROP_HTTPS_KEYSTORE_KEY_PASSWORD);
 
-    configuration.trustStore = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE);
+    configuration.trustStore = System.getProperty(JettyBootConstants.PROP_HTTPS_TRUSTSTORE);
 
     if (configuration.trustStore != null) {
       configuration.trustStoreType = System.getProperty(
-          JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_TYPE,
+          JettyBootConstants.PROP_HTTPS_TRUSTSTORE_TYPE,
           JettyBootConstants.DEFAULT_HTTPS_KEYSTORE_TYPE);
 
       configuration.trustStorePassword = System
-          .getProperty(JettyBootConstants.SYSPROP_HTTPS_TRUSTSTORE_PASSWORD);
+          .getProperty(JettyBootConstants.PROP_HTTPS_TRUSTSTORE_PASSWORD);
     }
 
-    configuration.clientCert = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_CLIENTCERT);
+    configuration.clientCert = System.getProperty(JettyBootConstants.PROP_HTTPS_CLIENTCERT);
 
     return configuration;
   }
@@ -272,7 +272,7 @@ public class JettyBootActivator implements BundleActivator {
   }
 
   private String resolveKeyStore(final BundleContext context) {
-    String result = System.getProperty(JettyBootConstants.SYSPROP_HTTPS_KEYSTORE);
+    String result = System.getProperty(JettyBootConstants.PROP_HTTPS_KEYSTORE);
     if (result == null) {
       result = context.getBundle().getResource("META-INF/keystore.jks").toExternalForm();
     }
@@ -290,7 +290,7 @@ public class JettyBootActivator implements BundleActivator {
       } else if (!JettyBootConstants.OPTION_CLIENTCERT_NONE
           .equalsIgnoreCase(configuration.clientCert)) {
         throw new IllegalArgumentException("Invalid value for property '"
-            + JettyBootConstants.SYSPROP_HTTPS_CLIENTCERT + "': " + configuration.clientCert);
+            + JettyBootConstants.PROP_HTTPS_CLIENTCERT + "': " + configuration.clientCert);
       }
     }
   }
