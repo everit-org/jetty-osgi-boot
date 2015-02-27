@@ -84,8 +84,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Import-Package>
-              javax.servlet.*;version="[2.6,4)",
-              org.eclipse.jetty.*;version="[9.0,10)",
+              javax.servlet.*;version="[2.7,4)",
               *
             </Import-Package>
             <Export-Package>
