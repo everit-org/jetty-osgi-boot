@@ -27,6 +27,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
+/**
+ * Bundle activator that registers the test service.
+ */
 public class JettyBootTestActivator implements BundleActivator {
 
   private ServiceRegistration<JettyTest> testSR;
@@ -41,7 +44,7 @@ public class JettyBootTestActivator implements BundleActivator {
           @Override
           public Server addingService(final ServiceReference<Server> reference) {
             Server server = context.getService(reference);
-            JettyTest jettyTest = new JettyTest(reference, server);
+            JettyTest jettyTest = new JettyTest(reference);
 
             Dictionary<String, Object> properties = new Hashtable<String, Object>();
             properties.put(TestRunnerConstants.SERVICE_PROPERTY_TEST_ID, "JettyTest");
@@ -52,12 +55,14 @@ public class JettyBootTestActivator implements BundleActivator {
           }
 
           @Override
-          public void modifiedService(final ServiceReference<Server> reference, final Server service) {
+          public void modifiedService(final ServiceReference<Server> reference,
+              final Server service) {
             // Nothing here
           }
 
           @Override
-          public void removedService(final ServiceReference<Server> reference, final Server service) {
+          public void removedService(final ServiceReference<Server> reference,
+              final Server service) {
             context.ungetService(reference);
           }
         });

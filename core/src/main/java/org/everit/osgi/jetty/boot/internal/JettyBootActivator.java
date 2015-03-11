@@ -65,8 +65,7 @@ public class JettyBootActivator implements BundleActivator {
     serverConnector.setName(CONNECTOR_NAME_HTTP);
   }
 
-  private void createHttpsConnector(final BundleContext context,
-      final JettyConfiguration configuration) {
+  private void createHttpsConnector(final JettyConfiguration configuration) {
     ServerConnector serverConnector = createServerConnector(configuration.host,
         configuration.httpsPort,
         configuration.idleTimeout);
@@ -311,7 +310,7 @@ public class JettyBootActivator implements BundleActivator {
     }
 
     if (configuration.httpsPort >= 0) {
-      createHttpsConnector(context, configuration);
+      createHttpsConnector(configuration);
     }
 
     ContextHandlerCollection handlerCollection = createServletContextCollection(context,

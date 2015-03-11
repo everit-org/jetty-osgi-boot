@@ -27,11 +27,26 @@ import org.everit.osgi.jetty.boot.JettyBootConstants;
 import org.junit.Test;
 import org.osgi.framework.ServiceReference;
 
+/**
+ * Tests if Jetty is really booted, listens on port and webconsole is running.
+ *
+ */
 public class JettyTest {
+
+  /**
+   * Simple {@link Authenticator} that authenticates with default user name and password on
+   * webconsole.
+   */
+  private static final class WebconsoleAuthenticator extends Authenticator {
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication() {
+      return new PasswordAuthentication("admin", "admin".toCharArray());
+    }
+  }
 
   private final ServiceReference<Server> reference;
 
-  public JettyTest(final ServiceReference<Server> reference, final Server server) {
+  public JettyTest(final ServiceReference<Server> reference) {
     this.reference = reference;
   }
 
@@ -48,12 +63,8 @@ public class JettyTest {
     int httpPort = (Integer) httpPortProp;
 
     try {
-      Authenticator.setDefault(new Authenticator() {
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-          return new PasswordAuthentication("admin", "admin".toCharArray());
-        }
-      });
+      Authenticator.setDefault(new WebconsoleAuthenticator());
+
       URL url = new URL("http://localhost:" + httpPort + "/system/console");
       readContent(url);
     } catch (IOException e) {
@@ -61,5 +72,4 @@ public class JettyTest {
     }
 
   }
-
 }
