@@ -20,8 +20,12 @@ import java.util.Hashtable;
 
 import org.apache.felix.http.proxy.ProxyListener;
 import org.apache.felix.http.proxy.ProxyServlet;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
@@ -69,6 +73,12 @@ public class JettyBootActivator implements BundleActivator {
     ServerConnector serverConnector = createServerConnector(configuration.host,
         configuration.httpsPort,
         configuration.idleTimeout);
+
+    ConnectionFactory connectionFactory = serverConnector.getConnectionFactory(HttpVersion.HTTP_1_1
+        .toString());
+    HttpConnectionFactory httpConnectionFactory = (HttpConnectionFactory) connectionFactory;
+    httpConnectionFactory.getHttpConfiguration().addCustomizer(new SecureRequestCustomizer());
+
     serverConnector.setName(CONNECTOR_NAME_HTTPS);
 
     SslConnectionFactory sslConnectionFactory = new SslConnectionFactory();
