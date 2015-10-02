@@ -3,7 +3,7 @@ A Bundle that starts a Jetty server with HTTPService support.
 The goal of this bundle the have the least dependency that is necessary
 to start a Web Server that can run OSGi Webconsole.
 
-The HTTPService support is based on the Apache Flix implementation.
+The HTTPService support is based on the Apache Felix implementation.
 
 After installing this bundle with its dependencies, a Jetty will
 be started on port 80 (HTTP) and 443 (HTTPS) by default. The default
@@ -67,3 +67,9 @@ settings can be overridden by the following system properties:
  * __org.everit.osgi.jetty.boot.https.clientcertificate__: Flag to determine
    if the HTTPS protocol requires, wants or does not use client certificates.
    Legal values are needs, wants and none. The default is none.
+
+## Download
+
+The bundle and its dependencies are available on [maven-central][1]
+
+[1]: http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22org.everit.osgi.jetty.boot%22
