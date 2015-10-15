@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.osgi.jetty.boot.tests;
+package org.everit.jetty.boot.tests;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +22,8 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 
 import org.eclipse.jetty.server.Server;
+import org.everit.jetty.boot.JettyBootConstants;
 import org.everit.osgi.dev.testrunner.TestDuringDevelopment;
-import org.everit.osgi.jetty.boot.JettyBootConstants;
 import org.junit.Test;
 import org.osgi.framework.ServiceReference;
 

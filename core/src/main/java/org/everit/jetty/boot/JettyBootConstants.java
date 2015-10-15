@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.osgi.jetty.boot;
+package org.everit.jetty.boot;
 
 /**
  * Constant values of Everit - Jetty Boot.
@@ -149,6 +149,7 @@ public final class JettyBootConstants {
    * <p>
    * For more information, see
    * {@link org.eclipse.jetty.server.AbstractConnector#setIdleTimeout(long)}.
+   * </p>
    */
   public static final String PROP_IDLE_TIMEOUT = "org.everit.osgi.jetty.boot.idle_timeout";
 
