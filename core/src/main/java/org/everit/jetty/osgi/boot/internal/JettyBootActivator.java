@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.jetty.boot.internal;
+package org.everit.jetty.osgi.boot.internal;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -34,7 +34,7 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.everit.jetty.boot.JettyBootConstants;
+import org.everit.jetty.osgi.boot.JettyBootConstants;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;

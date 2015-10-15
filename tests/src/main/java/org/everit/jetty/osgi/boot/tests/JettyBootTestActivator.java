@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.jetty.boot.tests;
+package org.everit.jetty.osgi.boot.tests;
 
 import java.util.Dictionary;
 import java.util.Hashtable;

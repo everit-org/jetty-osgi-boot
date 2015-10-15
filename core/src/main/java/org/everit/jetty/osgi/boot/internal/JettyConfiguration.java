@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.jetty.boot.internal;
+package org.everit.jetty.osgi.boot.internal;
 
 /**
  * Configuration settings of Jetty.

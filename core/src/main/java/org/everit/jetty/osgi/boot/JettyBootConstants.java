@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.everit.jetty.boot;
+package org.everit.jetty.osgi.boot;
 
 /**
  * Constant values of Everit - Jetty Boot.
@@ -66,13 +66,13 @@ public final class JettyBootConstants {
    * defaults to {@value #DEFAULT_CONTEXT_PATH}. This must be a valid path starting with a slash and
    * not ending with a slash (unless it is the root context).
    */
-  public static final String PROP_CONTEXT_PATH = "org.everit.osgi.jetty.boot.context_path";
+  public static final String PROP_CONTEXT_PATH = "org.everit.jetty.osgi.boot.context_path";
 
   /**
    * Host name or IP Address of the interface to listen on. The default is null causing Jetty to
    * listen on all interfaces.
    */
-  public static final String PROP_HTTP_HOST = "org.everit.osgi.jetty.boot.host";
+  public static final String PROP_HTTP_HOST = "org.everit.jetty.osgi.boot.host";
 
   /**
    * The port used for servlets and resources available via HTTP. A negative port number disables
@@ -91,55 +91,55 @@ public final class JettyBootConstants {
    * Legal values are needs, wants and none. The default is none.
    */
   public static final String PROP_HTTPS_CLIENTCERT =
-      "org.everit.osgi.jetty.boot.https.clientcertificate";
+      "org.everit.jetty.osgi.boot.https.clientcertificate";
 
   /**
    * The file or URL of the SSL Key store. Default value is the keystore that is embedded into the
    * boot bundle.
    */
-  public static final String PROP_HTTPS_KEYSTORE = "org.everit.osgi.jetty.boot.https.keystore";
+  public static final String PROP_HTTPS_KEYSTORE = "org.everit.jetty.osgi.boot.https.keystore";
 
   /**
    * Alias of SSL certificate for the connector.
    */
   public static final String PROP_HTTPS_KEYSTORE_KEY_ALIAS =
-      "org.everit.osgi.jetty.boot.https.keystore.key.alias";
+      "org.everit.jetty.osgi.boot.https.keystore.key.alias";
 
   /**
    * The password for the key in the keystore.
    */
   public static final String PROP_HTTPS_KEYSTORE_KEY_PASSWORD =
-      "org.everit.osgi.jetty.boot.https.keystore.key.password";
+      "org.everit.jetty.osgi.boot.https.keystore.key.password";
 
   /**
    * Password of the HTTPS keystore. Default value is {@value #DEFAULT_HTTPS_KEYSTORE_PASSWORD}.
    */
   public static final String PROP_HTTPS_KEYSTORE_PASSWORD =
-      "org.everit.osgi.jetty.boot.https.keystore.password";
+      "org.everit.jetty.osgi.boot.https.keystore.password";
 
   /**
    * Type of keystore for HTTPS connections. Default value is {@value #DEFAULT_HTTPS_KEYSTORE_TYPE}.
    */
   public static final String PROP_HTTPS_KEYSTORE_TYPE =
-      "org.everit.osgi.jetty.boot.https.keystore.type";
+      "org.everit.jetty.osgi.boot.https.keystore.type";
 
   /**
    * Path or URL of the file containing the truststore.
    */
   public static final String PROP_HTTPS_TRUSTSTORE =
-      "org.everit.osgi.jetty.boot.https.truststore";
+      "org.everit.jetty.osgi.boot.https.truststore";
 
   /**
    * The password for the trust store.
    */
   public static final String PROP_HTTPS_TRUSTSTORE_PASSWORD =
-      "org.everit.osgi.jetty.boot.https.truststore.password";
+      "org.everit.jetty.osgi.boot.https.truststore.password";
 
   /**
    * Type of truststore. Default value is {@value #DEFAULT_HTTPS_KEYSTORE_TYPE}.
    */
   public static final String PROP_HTTPS_TRUSTSTORE_TYPE =
-      "org.everit.osgi.jetty.boot.https.truststore.type";
+      "org.everit.jetty.osgi.boot.https.truststore.type";
 
   /**
    * Sets the maximum Idle time for a connection, which roughly translates to the
@@ -151,25 +151,25 @@ public final class JettyBootConstants {
    * {@link org.eclipse.jetty.server.AbstractConnector#setIdleTimeout(long)}.
    * </p>
    */
-  public static final String PROP_IDLE_TIMEOUT = "org.everit.osgi.jetty.boot.idle_timeout";
+  public static final String PROP_IDLE_TIMEOUT = "org.everit.jetty.osgi.boot.idle_timeout";
 
   /**
    * In case this system property is specified, it overrides the value of {@value #PROP_HTTP_PORT}
    * system property.
    */
-  public static final String PROP_JETTY_BOOT_HTTP_PORT = "org.everit.osgi.jetty.boot.http.port";
+  public static final String PROP_JETTY_BOOT_HTTP_PORT = "org.everit.jetty.osgi.boot.http.port";
 
   /**
    * In case this system property is specified, it overrides the value of
    * {@value #PROP_HTTP_PORT_SECURE} system property.
    */
   public static final String PROP_JETTY_BOOT_HTTP_PORT_SECURE =
-      "org.everit.osgi.jetty.boot.http.port.secure";
+      "org.everit.jetty.osgi.boot.http.port.secure";
 
   /**
    * Allows for the specification of the Session life time as a number of seconds.
    */
-  public static final String PROP_SESSION_TIMEOUT = "org.everit.osgi.jetty.boot.session.timeout";
+  public static final String PROP_SESSION_TIMEOUT = "org.everit.jetty.osgi.boot.session.timeout";
 
   /**
    * Jetty {@link org.eclipse.jetty.server.Server} is registered as an OSGi service with
