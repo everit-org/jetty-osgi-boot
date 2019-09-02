@@ -66,7 +66,7 @@ public class JettyBootActivator implements BundleActivator {
     ServerConnector serverConnector = createServerConnector(configuration.host,
         configuration.httpPort,
         configuration.idleTimeout);
-    serverConnector.setName(CONNECTOR_NAME_HTTP);
+    serverConnector.setName(JettyBootActivator.CONNECTOR_NAME_HTTP);
   }
 
   private void createHttpsConnector(final JettyConfiguration configuration) {
@@ -79,11 +79,12 @@ public class JettyBootActivator implements BundleActivator {
     HttpConnectionFactory httpConnectionFactory = (HttpConnectionFactory) connectionFactory;
     httpConnectionFactory.getHttpConfiguration().addCustomizer(new SecureRequestCustomizer());
 
-    serverConnector.setName(CONNECTOR_NAME_HTTPS);
+    serverConnector.setName(JettyBootActivator.CONNECTOR_NAME_HTTPS);
 
-    SslConnectionFactory sslConnectionFactory = new SslConnectionFactory();
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+    SslConnectionFactory sslConnectionFactory =
+        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
 
-    SslContextFactory sslContextFactory = sslConnectionFactory.getSslContextFactory();
     sslContextFactory.setKeyStorePath(configuration.keystore);
 
     sslContextFactory.setKeyStoreType(configuration.keyStoreType);
@@ -113,7 +114,7 @@ public class JettyBootActivator implements BundleActivator {
   private ServerConnector createServerConnector(final String host, final int port,
       final int idleTimeout) {
 
-    ServerConnector serverConnector = new ServerConnector(server);
+    ServerConnector serverConnector = new ServerConnector(this.server);
     if (host != null) {
       serverConnector.setHost(host);
     }
@@ -121,13 +122,13 @@ public class JettyBootActivator implements BundleActivator {
     serverConnector.setReuseAddress(true);
     serverConnector.setIdleTimeout(idleTimeout);
 
-    server.addConnector(serverConnector);
+    this.server.addConnector(serverConnector);
 
     return serverConnector;
   }
 
   private Dictionary<String, Object> createServiceProps(final JettyConfiguration configuration) {
-    Dictionary<String, Object> serviceProps = new Hashtable<String, Object>();
+    Dictionary<String, Object> serviceProps = new Hashtable<>();
 
     serviceProps.put(JettyBootConstants.PROP_HTTPS_KEYSTORE, configuration.keystore);
 
@@ -187,7 +188,7 @@ public class JettyBootActivator implements BundleActivator {
     servletContextHandler.setAttribute(BundleContext.class.getName(), context);
 
     SessionHandler sessionHandler = new SessionHandler();
-    sessionHandler.getSessionManager().setMaxInactiveInterval(configuration.sessionTimeout);
+    sessionHandler.setMaxInactiveInterval(configuration.sessionTimeout);
 
     servletContextHandler.setSessionHandler(sessionHandler);
     return handlerCollection;
@@ -290,7 +291,7 @@ public class JettyBootActivator implements BundleActivator {
   }
 
   private void setClientCertOnSSLContextFactory(final JettyConfiguration configuration,
-      final SslContextFactory sslContextFactory) {
+      final SslContextFactory.Server sslContextFactory) {
     if (configuration.clientCert != null) {
       if (JettyBootConstants.OPTION_CLIENTCERT_NEEDS.equalsIgnoreCase(configuration.clientCert)) {
         sslContextFactory.setNeedClientAuth(true);
@@ -313,7 +314,7 @@ public class JettyBootActivator implements BundleActivator {
       return;
     }
 
-    server = new Server();
+    this.server = new Server();
 
     if (configuration.httpPort >= 0) {
       createHttpConnector(configuration);
@@ -326,20 +327,21 @@ public class JettyBootActivator implements BundleActivator {
     ContextHandlerCollection handlerCollection = createServletContextCollection(context,
         configuration);
 
-    server.setHandler(handlerCollection);
+    this.server.setHandler(handlerCollection);
 
     try {
-      server.start();
+      this.server.start();
 
       updatePortsWithLive(configuration);
 
       Dictionary<String, Object> serviceProps = createServiceProps(configuration);
 
-      serverServiceRegistration = context.registerService(Server.class, server, serviceProps);
+      this.serverServiceRegistration =
+          context.registerService(Server.class, this.server, serviceProps);
     } catch (Exception e) {
       try {
-        server.stop();
-        server.destroy();
+        this.server.stop();
+        this.server.destroy();
       } catch (Exception stopE) {
         e.addSuppressed(stopE);
       }
@@ -349,23 +351,23 @@ public class JettyBootActivator implements BundleActivator {
 
   @Override
   public void stop(final BundleContext context) throws Exception {
-    if (serverServiceRegistration != null) {
-      serverServiceRegistration.unregister();
-      server.stop();
-      server.destroy();
+    if (this.serverServiceRegistration != null) {
+      this.serverServiceRegistration.unregister();
+      this.server.stop();
+      this.server.destroy();
     }
   }
 
   private void updatePortsWithLive(final JettyConfiguration configuration) {
-    Connector[] connectors = server.getConnectors();
+    Connector[] connectors = this.server.getConnectors();
     for (Connector connector : connectors) {
       if (connector instanceof NetworkConnector) {
         String connectorName = connector.getName();
-        if (CONNECTOR_NAME_HTTP.equals(connectorName)
-            || CONNECTOR_NAME_HTTPS.equals(connectorName)) {
+        if (JettyBootActivator.CONNECTOR_NAME_HTTP.equals(connectorName)
+            || JettyBootActivator.CONNECTOR_NAME_HTTPS.equals(connectorName)) {
           @SuppressWarnings("resource")
-          NetworkConnector networkConnector = ((NetworkConnector) connector);
-          if (CONNECTOR_NAME_HTTP.equals(connectorName)) {
+          NetworkConnector networkConnector = (NetworkConnector) connector;
+          if (JettyBootActivator.CONNECTOR_NAME_HTTP.equals(connectorName)) {
             configuration.httpPort = networkConnector.getLocalPort();
           } else {
             configuration.httpsPort = networkConnector.getLocalPort();

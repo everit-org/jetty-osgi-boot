@@ -23,12 +23,12 @@
   <parent>
     <groupId>org.everit.config</groupId>
     <artifactId>org.everit.config.oss</artifactId>
-    <version>7.1.0</version>
+    <version>8.0.0</version>
   </parent>
 
   <groupId>org.everit.jetty</groupId>
   <artifactId>org.everit.jetty.osgi.boot</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <packaging>bundle</packaging>
 
   <name>Everit - Jetty OSGi Boot</name>
@@ -36,8 +36,6 @@
 
   <properties>
     <projectpath>osgi-jetty-boot</projectpath>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
   <licenses>
@@ -106,7 +104,7 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>9.3.0.v20150612</version>
+      <version>9.4.20.v20190813</version>
       <exclusions>
         <exclusion>
           <artifactId>javax.servlet-api</artifactId>
