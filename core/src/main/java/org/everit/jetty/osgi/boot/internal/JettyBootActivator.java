@@ -20,10 +20,16 @@ import java.util.Hashtable;
 
 import org.apache.felix.http.proxy.ProxyListener;
 import org.apache.felix.http.proxy.ProxyServlet;
+import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.http2.HTTP2Cipher;
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
+import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NegotiatingServerConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
@@ -50,6 +56,10 @@ public class JettyBootActivator implements BundleActivator {
 
   private static final String CONNECTOR_NAME_HTTPS = "https";
 
+  private static final String PROTOCOL_NAME_ALPN = "alpn";
+
+  private static final String PROTOCOL_NAME_H2 = "h2";
+
   private Server server;
 
   private ServiceRegistration<Server> serverServiceRegistration;
@@ -60,6 +70,15 @@ public class JettyBootActivator implements BundleActivator {
     if (password != null) {
       serviceProps.put(syspropName, "*******");
     }
+  }
+
+  private HttpConfiguration createHttpConfiguration(final int port,
+      final int idleTimeout) {
+    HttpConfiguration httpConfiguration = new HttpConfiguration();
+    httpConfiguration.setSecureScheme(JettyBootActivator.CONNECTOR_NAME_HTTPS);
+    httpConfiguration.setSecurePort(port);
+    httpConfiguration.setIdleTimeout(idleTimeout);
+    return httpConfiguration;
   }
 
   private void createHttpConnector(final JettyConfiguration configuration) {
@@ -81,9 +100,17 @@ public class JettyBootActivator implements BundleActivator {
 
     serverConnector.setName(JettyBootActivator.CONNECTOR_NAME_HTTPS);
 
+    NegotiatingServerConnectionFactory alpnConnectionFactory =
+        (NegotiatingServerConnectionFactory) serverConnector
+            .getConnectionFactory(JettyBootActivator.PROTOCOL_NAME_ALPN);
+
     SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+
     SslConnectionFactory sslConnectionFactory =
-        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString());
+        new SslConnectionFactory(sslContextFactory, alpnConnectionFactory.getProtocol());
+
+    sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
+    sslContextFactory.setUseCipherSuitesOrder(true);
 
     sslContextFactory.setKeyStorePath(configuration.keystore);
 
@@ -113,8 +140,23 @@ public class JettyBootActivator implements BundleActivator {
 
   private ServerConnector createServerConnector(final String host, final int port,
       final int idleTimeout) {
+    HttpConfiguration httpConfiguration = createHttpConfiguration(port, idleTimeout);
 
-    ServerConnector serverConnector = new ServerConnector(this.server);
+    HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfiguration);
+
+    HTTP2ServerConnectionFactory http2ConnectionFactory =
+        new HTTP2ServerConnectionFactory(httpConfiguration);
+
+    HTTP2CServerConnectionFactory http2cConnectionFactory =
+        new HTTP2CServerConnectionFactory(httpConfiguration);
+
+    NegotiatingServerConnectionFactory alpnConnectionFactory =
+        new ALPNServerConnectionFactory(JettyBootActivator.PROTOCOL_NAME_H2);
+    alpnConnectionFactory.setDefaultProtocol(HttpVersion.HTTP_1_1.toString());
+
+    ServerConnector serverConnector =
+        new ServerConnector(this.server, alpnConnectionFactory, http2ConnectionFactory,
+            http2cConnectionFactory, httpConnectionFactory);
     if (host != null) {
       serverConnector.setHost(host);
     }

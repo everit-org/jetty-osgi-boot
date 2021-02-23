@@ -28,7 +28,7 @@
 
   <groupId>org.everit.jetty</groupId>
   <artifactId>org.everit.jetty.osgi.boot</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>Everit - Jetty OSGi Boot</name>
@@ -101,6 +101,20 @@
       <version>5.0.0</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- HTTP2 & ALPN -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-alpn-server</artifactId>
+      <version>9.4.36.v20210114</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.http2</groupId>
+      <artifactId>http2-server</artifactId>
+      <version>9.4.36.v20210114</version>
+    </dependency>
+    <!-- End of HTTP2 & ALPN -->
+    
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
