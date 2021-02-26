@@ -36,6 +36,7 @@
 
   <properties>
     <projectpath>osgi-jetty-boot</projectpath>
+    <jetty.version>9.4.36.v20210114</jetty.version>
   </properties>
 
   <licenses>
@@ -106,19 +107,31 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-alpn-server</artifactId>
-      <version>9.4.36.v20210114</version>
+      <version>${jetty.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.http2</groupId>
       <artifactId>http2-server</artifactId>
-      <version>9.4.36.v20210114</version>
+      <version>${jetty.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- End of HTTP2 & ALPN -->
     
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>9.4.20.v20190813</version>
+      <version>${jetty.version}</version>
       <exclusions>
         <exclusion>
           <artifactId>javax.servlet-api</artifactId>
