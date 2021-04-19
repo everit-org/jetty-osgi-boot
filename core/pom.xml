@@ -28,7 +28,8 @@
 
   <groupId>org.everit.jetty</groupId>
   <artifactId>org.everit.jetty.osgi.boot</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
+
   <packaging>bundle</packaging>
 
   <name>Everit - Jetty OSGi Boot</name>
@@ -36,6 +37,7 @@
 
   <properties>
     <projectpath>osgi-jetty-boot</projectpath>
+    <org.eclipse.jetty.version>9.4.39.v20210325</org.eclipse.jetty.version>
   </properties>
 
   <licenses>
@@ -104,7 +106,8 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>9.4.20.v20190813</version>
+      <version>${org.eclipse.jetty.version}</version>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>javax.servlet-api</artifactId>
@@ -128,4 +131,38 @@
       <version>2.3.2</version>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <property>
+          <name>env.CI</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <version>6.1.2</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <configuration>
+                  <!-- high or above -->
+                  <failBuildOnCVSS>7</failBuildOnCVSS>
+                  <suppressionFile>${nvd.supprpression.file}</suppressionFile>
+                  <skipProvidedScope>true</skipProvidedScope>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

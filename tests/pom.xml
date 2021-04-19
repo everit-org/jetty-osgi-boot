@@ -29,11 +29,15 @@
   </parent>
 
   <artifactId>org.everit.jetty.osgi.boot.tests</artifactId>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
 
   <packaging>bundle</packaging>
 
   <name>Everit - Jetty OSGi Boot Tests</name>
+
+  <properties>
+    <org.eclipse.jetty.version>9.4.39.v20210325</org.eclipse.jetty.version>
+  </properties>
 
   <build>
     <plugins>
@@ -117,6 +121,18 @@
       <groupId>org.everit.osgi.dev</groupId>
       <artifactId>org.everit.osgi.dev.richconsole</artifactId>
       <version>1.2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>${org.eclipse.jetty.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
